@@ -1,1 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doom in HTML</title>
+    <script src="doom.js"></script> <!-- Path to the doom.js file -->
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            margin: auto;
+            background: black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="640" height="480"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Load the game WAD file
+        const wadFile = 'doom.wad'; // Ensure this matches your WAD file name
+
+        // Initialize and start the Doom game
+        const game = new DoomGame(canvas, wadFile);
+        game.start();
+    </script>
+</body>
+</html>
 
