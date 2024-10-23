@@ -1,256 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced HTML Example</title>
+    <title>2D Box Creator with Physics</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(to right, #74ebd5, #acb6e5);
-            color: #333;
             margin: 0;
             padding: 20px;
-            text-align: center;
-            transition: background-color 0.5s;
         }
 
-        header {
-            background: #333;
-            color: white;
-            padding: 10px 0;
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        button {
-            background-color: #28a745;
-            border: none;
-            color: white;
-            padding: 15px 20px;
-            margin: 10px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s;
+        .controls {
+            margin-bottom: 20px;
         }
 
-        button:hover {
-            background-color: #218838;
-            transform: scale(1.05);
+        .frame {
+            width: 600px;
+            height: 400px;
+            border: 2px solid #333;
+            position: relative;
+            overflow: hidden;
+            background-color: #f0f0f0;
         }
 
-        .animated {
-            transition: transform 0.2s;
-        }
-
-        section {
-            margin-top: 20px;
-        }
-
-        canvas {
-            border: 1px solid #ccc;
-            margin-top: 20px;
-        }
-
-        form {
-            margin-top: 20px;
-        }
-
-        input[type="text"],
-        input[type="email"],
-        input[type="color"] {
-            padding: 10px;
-            margin: 5px;
-            width: calc(100% - 22px);
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        footer {
-            margin-top: 40px;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgb(0, 0, 0);
-            background-color: rgba(0, 0, 0, 0.4);
-            padding-top: 60px;
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
+        .box {
+            width: 100px;
+            height: 100px;
+            position: absolute;
+            cursor: move;
+            transition: background-color 0.3s;
         }
     </style>
 </head>
-
 <body>
-
-    <header>
-        <h1>Advanced HTML Example</h1>
-    </header>
-
-    <section>
-        <h2>Interactive Buttons</h2>
-        <button id="alertButton" class="animated">Show Alert</button>
-        <button id="changeBgButton" class="animated">Change Background Color</button>
-        <button id="drawButton" class="animated">Draw on Canvas</button>
-        <button id="showModalButton" class="animated">Open Modal</button>
-    </section>
-
-    <section>
-        <h2>Draw Shapes</h2>
-        <input type="text" id="shapeInput" placeholder="Enter shape (circle/square)">
-        <input type="color" id="colorPicker" value="#000000">
-        <button id="drawShapeButton" class="animated">Draw Shape</button>
-    </section>
-
-    <section>
-        <h2>Input Form</h2>
-        <form id="userForm">
-            <input type="text" id="name" placeholder="Enter your name" required>
-            <input type="email" id="email" placeholder="Enter your email" required>
-            <button type="submit" class="animated">Submit</button>
-        </form>
-        <p id="formFeedback" class="hidden"></p>
-    </section>
-
-    <section>
-        <h2>Canvas Drawing</h2>
-        <canvas id="drawingCanvas" width="400" height="200"></canvas>
-    </section>
-
-    <footer>
-        <p>&copy; 2023 Advanced HTML Example</p>
-    </footer>
-
-    <!-- Modal -->
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <p>This is a modal dialog!</p>
+    <div class="container">
+        <div class="controls">
+            <input type="file" id="file-upload" accept=".png, .bmp, .jpg" />
+            <input type="color" id="color-picker" />
+            <button id="create-box">Create</button>
         </div>
+        <div class="frame" id="frame"></div>
     </div>
 
     <script>
-        // Counter for button clicks
-        let clickCount = 0;
+        const createBoxButton = document.getElementById('create-box');
+        const colorPicker = document.getElementById('color-picker');
+        const fileUpload = document.getElementById('file-upload');
+        const frame = document.getElementById('frame');
 
-        // Button to show an alert
-        document.getElementById('alertButton').onclick = function () {
-            alert('Hello! This is an alert message.');
-            trackClick();
-        };
+        createBoxButton.addEventListener('click', () => {
+            const color = colorPicker.value;
+            createDraggableBox(color);
+        });
 
-        // Button to change the background color
-        document.getElementById('changeBgButton').onclick = function () {
-            document.body.style.backgroundColor =
-                '#' + Math.floor(Math.random() * 16777215).toString(16);
-            trackClick();
-        };
-
-        // Drawing on the canvas
-        let canvas = document.getElementById('drawingCanvas');
-        let ctx = canvas.getContext('2d');
-
-        document.getElementById('drawButton').onclick = function () {
-            ctx.fillStyle = 'blue';
-            ctx.fillRect(50, 50, 100, 100);
-            trackClick();
-        };
-
-        // Function to draw shapes based on user input
-        document.getElementById('drawShapeButton').onclick = function () {
-            const shape = document.getElementById('shapeInput').value.toLowerCase();
-            const color = document.getElementById('colorPicker').value;
-
-            ctx.fillStyle = color;
-
-            if (shape === 'circle') {
-                ctx.beginPath();
-                ctx.arc(200, 100, 50, 0, Math.PI * 2);
-                ctx.fill();
-            } else if (shape === 'square') {
-                ctx.fillRect(200 - 50, 100 - 50, 100, 100);
+        fileUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file && (file.type === 'image/png' || file.type === 'image/bmp' || file.type === 'image/jpeg')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const texture = e.target.result;
+                    createDraggableBox(texture);
+                };
+                reader.readAsDataURL(file);
             } else {
-                alert("Please enter 'circle' or 'square'.");
+                alert('Please upload a valid image file (.png, .bmp, .jpg)');
             }
-            trackClick();
-        };
+        });
 
-        // Form handling
-        document.getElementById('userForm').onsubmit = function (event) {
-            event.preventDefault(); // Prevent form submission
-
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-
-            // Simple form validation
-            if (name && email) {
-                document.getElementById('formFeedback').innerText =
-                    `Thank you for submitting, ${name}!`;
-                document.getElementById('formFeedback').classList.remove('hidden');
+        function createDraggableBox(content) {
+            const box = document.createElement('div');
+            box.classList.add('box');
+            if (typeof content === 'string' && content.startsWith('data:image/png')) {
+                box.style.backgroundImage = `url(${content})`;
+                box.style.backgroundSize = 'cover';
             } else {
-                alert("Please fill in all fields.");
+                box.style.backgroundColor = content;
             }
-        };
+            box.style.left = `${Math.random() * (frame.clientWidth - 100)}px`;
+            box.style.top = `${Math.random() * (frame.clientHeight - 100)}px`;
 
-        // Function to track button clicks
-        function trackClick() {
-            clickCount++;
-            console.log(`Button clicked ${clickCount} times`);
+            // Add physics-like effects
+            box.style.transition = 'transform 0.1s ease';
+            frame.appendChild(box);
+            makeDraggable(box);
         }
 
-        // Modal handling
-        const modal = document.getElementById("myModal");
-        const btn = document.getElementById("showModalButton");
-        const span = document.getElementsByClassName("close")[0];
+        function makeDraggable(element) {
+            let offsetX, offsetY;
 
-        // When the user clicks the button, open the modal
-        btn.onclick = function () {
-            modal.style.display = "block";
-            trackClick();
-        };
+            element.addEventListener('mousedown', (e) => {
+                offsetX = e.clientX - element.getBoundingClientRect().left;
+                offsetY = e.clientY - element.getBoundingClientRect().top;
 
-        // When the user clicks on <span> (x), close the modal
-        span.onclick = function () {
-            modal.style.display = "none";
-        };
+                document.addEventListener('mousemove', mouseMoveHandler);
+                document.addEventListener('mouseup', mouseUpHandler);
+            });
 
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function (event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
+            function mouseMoveHandler(e) {
+                const frameRect = frame.getBoundingClientRect();
+                let newLeft = e.clientX - offsetX - frameRect.left;
+                let newTop = e.clientY - offsetY - frameRect.top;
+
+                // Prevent the box from going outside the frame
+                newLeft = Math.max(0, Math.min(newLeft, frame.clientWidth - 100));
+                newTop = Math.max(0, Math.min(newTop, frame.clientHeight - 100));
+
+                element.style.transform = `translate(${newLeft}px, ${newTop}px)`;
             }
-        };
+
+            function mouseUpHandler() {
+                document.removeEventListener('mousemove', mouseMoveHandler);
+                document.removeEventListener('mouseup', mouseUpHandler);
+            }
+        }
     </script>
-
 </body>
-
 </html>
