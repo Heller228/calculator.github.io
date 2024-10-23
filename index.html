@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Complex HTML Example</title>
+    <title>Advanced HTML Example</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,6 +13,7 @@
             margin: 0;
             padding: 20px;
             text-align: center;
+            transition: background-color 0.5s;
         }
 
         header {
@@ -27,19 +29,16 @@
             padding: 15px 20px;
             margin: 10px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.2s;
         }
 
         button:hover {
             background-color: #218838;
+            transform: scale(1.05);
         }
 
         .animated {
             transition: transform 0.2s;
-        }
-
-        .animated:hover {
-            transform: scale(1.1);
         }
 
         section {
@@ -55,7 +54,9 @@
             margin-top: 20px;
         }
 
-        input[type="text"], input[type="email"] {
+        input[type="text"],
+        input[type="email"],
+        input[type="color"] {
             padding: 10px;
             margin: 5px;
             width: calc(100% - 22px);
@@ -70,82 +71,186 @@
         footer {
             margin-top: 40px;
         }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
+
 <body>
 
-<header>
-    <h1>Complex HTML Example</h1>
-</header>
+    <header>
+        <h1>Advanced HTML Example</h1>
+    </header>
 
-<section>
-    <h2>Interactive Buttons</h2>
-    <button id="alertButton" class="animated">Show Alert</button>
-    <button id="changeBgButton" class="animated">Change Background Color</button>
-    <button id="drawButton" class="animated">Draw on Canvas</button>
-</section>
+    <section>
+        <h2>Interactive Buttons</h2>
+        <button id="alertButton" class="animated">Show Alert</button>
+        <button id="changeBgButton" class="animated">Change Background Color</button>
+        <button id="drawButton" class="animated">Draw on Canvas</button>
+        <button id="showModalButton" class="animated">Open Modal</button>
+    </section>
 
-<section>
-    <h2>Input Form</h2>
-    <form id="userForm">
-        <input type="text" id="name" placeholder="Enter your name" required>
-        <input type="email" id="email" placeholder="Enter your email" required>
-        <button type="submit" class="animated">Submit</button>
-    </form>
-    <p id="formFeedback" class="hidden"></p>
-</section>
+    <section>
+        <h2>Draw Shapes</h2>
+        <input type="text" id="shapeInput" placeholder="Enter shape (circle/square)">
+        <input type="color" id="colorPicker" value="#000000">
+        <button id="drawShapeButton" class="animated">Draw Shape</button>
+    </section>
 
-<section>
-    <h2>Canvas Drawing</h2>
-    <canvas id="drawingCanvas" width="400" height="200"></canvas>
-</section>
+    <section>
+        <h2>Input Form</h2>
+        <form id="userForm">
+            <input type="text" id="name" placeholder="Enter your name" required>
+            <input type="email" id="email" placeholder="Enter your email" required>
+            <button type="submit" class="animated">Submit</button>
+        </form>
+        <p id="formFeedback" class="hidden"></p>
+    </section>
 
-<footer>
-    <p>&copy; 2023 Complex HTML Example</p>
-</footer>
+    <section>
+        <h2>Canvas Drawing</h2>
+        <canvas id="drawingCanvas" width="400" height="200"></canvas>
+    </section>
 
-<script>
-    // Button to show an alert
-    document.getElementById('alertButton').onclick = function() {
-        alert('Hello! This is an alert message.');
-    };
+    <footer>
+        <p>&copy; 2023 Advanced HTML Example</p>
+    </footer>
 
-    // Button to change the background color
-    document.getElementById('changeBgButton').onclick = function() {
-        document.body.style.backgroundColor = 
-            '#' + Math.floor(Math.random()*16777215).toString(16);
-    };
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>This is a modal dialog!</p>
+        </div>
+    </div>
 
-    // Drawing on the canvas
-    let canvas = document.getElementById('drawingCanvas');
-    let ctx = canvas.getContext('2d');
+    <script>
+        // Counter for button clicks
+        let clickCount = 0;
 
-    document.getElementById('drawButton').onclick = function() {
-        ctx.fillStyle = 'blue';
-        ctx.fillRect(50, 50, 100, 100);
-        ctx.fillStyle = 'red';
-        ctx.arc(200, 100, 50, 0, Math.PI * 2);
-        ctx.fill();
-    };
+        // Button to show an alert
+        document.getElementById('alertButton').onclick = function () {
+            alert('Hello! This is an alert message.');
+            trackClick();
+        };
 
-    // Form handling
-    document.getElementById('userForm').onsubmit = function(event) {
-        event.preventDefault(); // Prevent form submission
+        // Button to change the background color
+        document.getElementById('changeBgButton').onclick = function () {
+            document.body.style.backgroundColor =
+                '#' + Math.floor(Math.random() * 16777215).toString(16);
+            trackClick();
+        };
 
-        const name = document.getElementById('name').value;
-        const email = document.getElementById('email').value;
+        // Drawing on the canvas
+        let canvas = document.getElementById('drawingCanvas');
+        let ctx = canvas.getContext('2d');
 
-        // Simple form validation
-        if (name && email) {
-            document.getElementById('formFeedback').innerText = 
-                `Thank you for submitting, ${name}!`;
-            document.getElementById('formFeedback').classList.remove('hidden');
-        } else {
-            alert("Please fill in all fields.");
+        document.getElementById('drawButton').onclick = function () {
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(50, 50, 100, 100);
+            trackClick();
+        };
+
+        // Function to draw shapes based on user input
+        document.getElementById('drawShapeButton').onclick = function () {
+            const shape = document.getElementById('shapeInput').value.toLowerCase();
+            const color = document.getElementById('colorPicker').value;
+
+            ctx.fillStyle = color;
+
+            if (shape === 'circle') {
+                ctx.beginPath();
+                ctx.arc(200, 100, 50, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (shape === 'square') {
+                ctx.fillRect(200 - 50, 100 - 50, 100, 100);
+            } else {
+                alert("Please enter 'circle' or 'square'.");
+            }
+            trackClick();
+        };
+
+        // Form handling
+        document.getElementById('userForm').onsubmit = function (event) {
+            event.preventDefault(); // Prevent form submission
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+
+            // Simple form validation
+            if (name && email) {
+                document.getElementById('formFeedback').innerText =
+                    `Thank you for submitting, ${name}!`;
+                document.getElementById('formFeedback').classList.remove('hidden');
+            } else {
+                alert("Please fill in all fields.");
+            }
+        };
+
+        // Function to track button clicks
+        function trackClick() {
+            clickCount++;
+            console.log(`Button clicked ${clickCount} times`);
         }
-    };
-</script>
+
+        // Modal handling
+        const modal = document.getElementById("myModal");
+        const btn = document.getElementById("showModalButton");
+        const span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal
+        btn.onclick = function () {
+            modal.style.display = "block";
+            trackClick();
+        };
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+        };
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        };
+    </script>
 
 </body>
-</html>
 
+</html>
