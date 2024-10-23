@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2D Box Creator with Physics</title>
+    <title>2DBox Example</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -108,10 +108,7 @@
                 let newLeft = e.clientX - offsetX - frameRect.left;
                 let newTop = e.clientY - offsetY - frameRect.top;
 
-                // Prevent the box from going outside the frame
-                newLeft = Math.max(0, Math.min(newLeft, frame.clientWidth - 100));
-                newTop = Math.max(0, Math.min(newTop, frame.clientHeight - 100));
-
+               
                 element.style.transform = `translate(${newLeft}px, ${newTop}px)`;
             }
 
